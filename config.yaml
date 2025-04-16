@@ -1,0 +1,65 @@
+# general
+seed: 2025
+exp_id: 1604
+log_dir: "logs/news"
+
+dataset_pt: "web-text-tok-opt.hf"
+split_pt: # none: set dataset_pt: "muse-news-train.hf" and split_pt to retain2 if you want to use MUSE-News retain splits
+dataset: "muse-books-train.hf"
+split: "forget"
+use_chunking: True # set True for books
+
+gen_eval_name: "news" # "news" # "general" #
+tokenizer: "muse-news-target"
+network: "muse-news-target" 
+network_base: # none: specify for NPO!
+# early stopping check
+stop_metric: "verbmem_f"
+stop_val: 20.0
+
+context: 1024
+
+# unlearning losses:
+# ll - log likelihood (for unlearn)
+# nlul - negative unlikelihood (for unlearning)
+# nlul_mc - nlul with model thresholding (needs base model)
+#           // Thresholding probabilities are coming from a 
+#           // smaller model that does not memorize. This is
+#           // to avoid unlearning tokens that correspond to 
+#           // text coherence rather than memorization
+# kl/qkl - kl divergence with a smaller model that does not memorize
+# 
+#
+
+loss: "nlul" # see above
+penalty: "qkl" # qkl / kl
+
+optimizer: "adamw" # must be "sgd" for MT
+lr: 0.0001
+
+# adamw
+b1: 0.9
+b2: 0.95
+warmup: 50
+
+# sgd
+momentum: 0.9
+
+micro_batch: 4
+forget_accum_steps: 5
+kl_accum_steps: 5
+eval_accum_steps: 4
+eval_every: 99
+
+epochs: 10
+steps: 100 # 3600 / 4 = 900 / 50 = 
+clip: 1.0
+
+alpha: 0.1
+beta: 1.0
+delta: 0.005 # set = 0 for baseline
+damp: 1.0 # set = 0 for baseline
+
+# referred to losses
+tol: 0.02
+beta_npo: 0.1
